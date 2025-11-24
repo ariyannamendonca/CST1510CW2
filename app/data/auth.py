@@ -12,35 +12,61 @@ def verify_password(plain_text_pass, hashed_password):
     hashed_pass_bytes = hashed_password.encode('utf-8')
     return bcrypt.checkpw(password_bytes, hashed_pass_bytes)
 
-USER_DATA_FILE = "user.txt"
-def register(username, password):
+USER_DATA_FILE = "../../DATA/user.txt"
+
+def register_user(username, password):
     open(USER_DATA_FILE, 'a').close()
     for line in open(USER_DATA_FILE, 'r'):
-        existing_username = line.strip().split(':')[0]
+        existing_username = line.strip().split(',')[0]
         if existing_username == username:
-            print("User already exists. Please log in.")
+            print("Error: Username already exists") #change it to username (name) alr exists
             return False
 
     hashed_password = hash_password(password).decode('utf-8')
-    with open(USER_DATA_FILE, 'a') as file:
-        file.write(f'{username}:{hashed_password}\n')
 
-    print(f'{username} registered')
+    with open(USER_DATA_FILE, 'a') as file:
+        file.write(f'{username},{hashed_password}\n')
+
+    print(f'{username} registered successfully!')
     return True
 
-def login(username, password):
+def user_exists(username):
     with open(USER_DATA_FILE, 'r') as file:
         for line in file:
-            user, hashed_password = line.strip().split(':', maxsplit=1)
-            if user == username:
-                if verify_password(password, hashed_password):
+            stored_user = line.strip().split(",")[0]
+            if stored_user == username:
+                return True
+    return False
+
+def login_user(username, password):
+    with open(USER_DATA_FILE, 'r') as file:
+        for line in file:
+            stored_user, stored_hash = line.strip().split(",")
+
+            if stored_user == username:
+                if verify_password(password, stored_hash):
                     print("Login successful.")
                     return True
                 else:
-                    print("Login failed.")
+                    print("Error: Invalid Password.")
                     return False
     print("Username not found")
     return False
+
+def validate_username(username):
+  if len(username) < 5:
+      print ("Username too short.")
+      return False
+  if "_ , *" in username:
+      print ("Username cant contain this.")
+      return False
+  return True, ""
+
+def validate_password(password):
+    if len(password) < 8:
+        print ("Password too short, need at least 8 characters.")
+        return False
+    return True, ""
 
 def display_menu():
     """Displays the main menu options."""
@@ -97,8 +123,6 @@ def main():
 
             #Attempt login
             if login_user(username, password):
-                print("Login successful.")
-
                 input("\nPress enter to return to main menu...")
 
         elif choice == '3':
