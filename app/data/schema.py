@@ -40,14 +40,17 @@ def create_datasets_metadata_table(conn):
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS datasets_metadata (
                    id INTEGER PRIMARY KEY AUTOINCREMENT, 
-                   name TEXT NOT NULL,
-                   source TEXT,
+                   dataset_name TEXT NOT NULL,
                    category TEXT,
-                   size INTEGER,
-                   created_date
+                   source TEXT,
+                   last_updated TEXT,
+                   record_count INTEGER,
+                   file_size_mb REAL,
+                   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
     conn.commit()
+    print("Datasets metadata table is created.")
 
 def create_it_tickets_table(conn):
     """Create it_tickets table."""
@@ -55,14 +58,20 @@ def create_it_tickets_table(conn):
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS it_tickets (
                     id INTEGER PRIMARY KEY AUTOINCREMENT, 
-                    title TEXT NOT NULL,
-                    priority TEXT NOT NULL,
-                    status TEXT DEFAULT 'open',
+                    ticket_id TEXT UNIQUE NOT NULL,
+                    priority TEXT, 
+                    status TEXT, 
+                    category TEXT, 
+                    subject TEXT NOT NULL,
+                    description TEXT,
                     created_date TEXT,
-                    description TEXT
+                    resolved_date TEXT,
+                    assigned_to TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
     conn.commit()
+    print("IT tickets table is created.")
 
 def create_all_tables(conn):
     """Create all tables."""
