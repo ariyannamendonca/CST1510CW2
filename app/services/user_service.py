@@ -1,15 +1,20 @@
-import bcrypt
-import pandas as pd
 import sqlite3
 from pathlib import Path
-from app.data.db import connect_database
-from app.data.users import get_user_by_username, insert_user
 
-DATA_DIR = Path("DATA")
-USER_FILEPATH = Path("DATA") / "user.txt"
+import bcrypt
+import pandas as pd
+
+from app.data.db import connect_database
+
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+
+DATA_DIR = PROJECT_ROOT / "DATA"
+
+USER_FILEPATH = DATA_DIR / "user.txt"
 DATASETS_CSV = DATA_DIR / "datasets_metadata.csv"
 IT_TICKETS_CSV = DATA_DIR / "it_tickets.csv"
 CYBER_INCIDENTS_CSV = DATA_DIR / "cyber_incidents.csv"
+
 def register_user(username, password, role='user'):
     """Register a new user in database."""
     conn = connect_database()
@@ -66,7 +71,7 @@ def migrate_users_from_file(conn, filepath = USER_FILEPATH):
     if not filepath.exists():
         print(f"File not found: {filepath}")
         print("     No users to migrate.")
-        return
+        return 0
 
     cursor = conn.cursor()
     migrated_count = 0
@@ -94,7 +99,10 @@ def migrate_users_from_file(conn, filepath = USER_FILEPATH):
                 except sqlite3.Error as e:
                     print(f"Error migrating user{username}: {e}")
 
-def load_csv_to_table(conn, csv_path, table_name):
+    conn.commit()
+    return migrated_count
+
+def load_csv_to_table(conn, csv_path, table_name, migrated_count=None, filepath=None):
     """Load csv into table"""
     if not csv_path.exists():
         print(f"File not found: {csv_path}")
@@ -112,13 +120,11 @@ def load_csv_to_table(conn, csv_path, table_name):
             index=False # Do not save the DataFrame index as a column
         )
 
+        conn.commit()
+        
         print(f" Successfully loaded {rows_to_load} rows into '{table_name}' from {csv_path.name}")
         return rows_to_load
 
     except Exception as e:
         print(f"Error loading data from {csv_path.name} into {table_name}: {e}")
         return 0
-
-    conn.commit()
-    print(f"Migrated {migrated_count} user from {filepath.name}")
-

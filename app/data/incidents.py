@@ -18,31 +18,31 @@ def insert_incident(conn, date, category, severity, status, description, reporte
 def get_all_incidents(conn):
     """Get all incidents."""
     df = pd.read_sql_query(
-        "SELECT * FROM cyber_incidents ORDER BY incident_id DESC",
+        "SELECT * FROM cyber_incidents ORDER BY id DESC",
         conn
     )
     return df
 
-def update_incident_status(conn, incident_id, status):
+def update_incident_status(conn, id, status):
     """Update incident status."""
     cursor = conn.cursor()
     sql_update = """
         UPDATE cyber_incidents
         SET status = ?
-        WHERE incident_id = ?
+        WHERE id = ?
     """
-    cursor.execute(sql_update, (status, incident_id))
+    cursor.execute(sql_update, (status, id))
     conn.commit()
     return cursor.rowcount
 
-def delete_incident_status(conn, incident_id):
+def delete_incident_status(conn, id):
     """Delete incident status."""
     cursor = conn.cursor()
     sql_delete = """
         DELETE FROM cyber_incidents
-        WHERE incident_id = ?
+        WHERE id = ?
     """
-    cursor.execute(sql_delete, (incident_id,))
+    cursor.execute(sql_delete, (id,))
     conn.commit()
     return cursor.rowcount
 

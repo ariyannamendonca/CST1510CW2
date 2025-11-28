@@ -20,7 +20,7 @@ def create_cyber_incidents_table(conn):
     cursor = conn.cursor()
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS cyber_incidents (
-                    incident_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
                     timestamp TEXT,
                     category TEXT,
                     severity TEXT NOT NULL,

@@ -2,7 +2,8 @@ import sqlite3
 import os
 from pathlib import Path
 
-DB_PATH = Path("DATA") / "intelligence_platform.db"
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+DB_PATH = PROJECT_ROOT / "DATA" / "intelligence_platform.db"
 
 def connect_database(db_path=DB_PATH):
     """Connect to SQLite database"""
