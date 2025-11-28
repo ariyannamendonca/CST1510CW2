@@ -1,11 +1,72 @@
-from app.data.db import connect_database, DB_PATH
+from app.data.db import connect_database, DB_PATH, PROJECT_ROOT
 from app.data.schema import create_all_tables
 from app.services.user_service import migrate_users_from_file
+import pandas as pd
 
+def csv_path(filename):
+    return PROJECT_ROOT / "DATA" / filename
+
+def load_cyber_incidents(conn):
+    """Load cyber_incidents.csv in database"""
+    try:
+        df = pd.read_csv(csv_path("cyber_incidents.csv"))
+
+        if "incident_id" in df.columns:
+            df = df.drop(columns=["incident_id"])
+
+        df.to_sql("cyber_incidents", conn, if_exists="append", index=False)
+        print(f" Successfully loaded {len(df)} rows into 'cyber_incidents'")
+        return len(df)
+
+    except Exception as e:
+        print(f"Error loading data into 'cyber_incidents' table: {e}")
+        return 0
+
+def load_datasets_metadata(conn):
+    """Load datasets_metadata.csv in database"""
+    try:
+        df = pd.read_csv(csv_path("datasets_metadata.csv"))
+
+        if "dataset_id" in df.columns:
+            df = df.drop(columns=["dataset_id"])
+
+        df.to_sql("datasets_metadata", conn, if_exists="append", index=False)
+        print(f" Successfully loaded {len(df)} rows into 'datasets_metadata'")
+        return len(df)
+
+    except Exception as e:
+        print(f"Error loading data into 'datasets_metadata' table: {e}")
+        return 0
+
+def load_it_tickets(conn):
+    """Load it_tickets.csv in database"""
+    try:
+        df = pd.read_csv(csv_path("it_tickets.csv"))
+
+        if "id" in df.columns:
+            df = df.drop(columns=["id"])
+
+        if "ticket_id" in df.columns:
+            df = df.drop(columns=["ticket_id"])
+
+        df.to_sql("it_tickets", conn, if_exists="append", index=False)
+        print(f" Successfully loaded {len(df)} rows into 'it_tickets'")
+        return len(df)
+
+    except Exception as e:
+        print(f"Error loading data into 'it_tickets' table: {e}")
+        return 0
 
 def load_all_csv_data(conn):
-    pass
+    """Load all_csv_data.csv in database"""
+    print("Moving all CSV data")
 
+    total = 0
+    total += load_cyber_incidents(conn)
+    total += load_datasets_metadata(conn)
+    total += load_it_tickets(conn)
+
+    return total
 
 def setup_database_complete():
     """
