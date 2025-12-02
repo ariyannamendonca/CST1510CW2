@@ -2,22 +2,22 @@ import bcrypt
 import os
 
 def hash_password(plain_text_pass):
-    password_bytes = plain_text_pass.encode('utf-8')
-    salt = bcrypt.gensalt()
+    password_bytes = plain_text_pass.encode('utf-8') #converts plain text pass into bytes so it gets hashed
+    salt = bcrypt.gensalt() #combines with pass before hashing so hashed results r different
     hashed_password = bcrypt.hashpw(password_bytes, salt)
     return hashed_password
 
 def verify_password(plain_text_pass, hashed_password):
-    password_bytes = plain_text_pass.encode('utf-8')
-    hashed_pass_bytes = hashed_password.encode('utf-8')
-    return bcrypt.checkpw(password_bytes, hashed_pass_bytes)
+    password_bytes = plain_text_pass.encode('utf-8') #encodes what user entered to bytes
+    hashed_pass_bytes = hashed_password.encode('utf-8') #stored hash converted to bytes
+    return bcrypt.checkpw(password_bytes, hashed_pass_bytes) #salt rehashes password_bytes, compares both hashes
 
-USER_DATA_FILE = "../../DATA/user.txt"
+USER_DATA_FILE = "../../DATA/user.txt" #file path where user.txt is stored
 
 def register_user(username, password):
     open(USER_DATA_FILE, 'a').close()
     for line in open(USER_DATA_FILE, 'r'):
-        existing_username = line.strip().split(',')[0]
+        existing_username = line.strip().split(',')[0]# checks if username is taken
         if existing_username == username:
             print("Error: Username already exists") #change it to username (name) alr exists
             return False
